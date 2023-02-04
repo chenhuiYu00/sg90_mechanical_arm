@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <vector>
 
+#define __packed __attribute__((packed))
+
 // ROS
 #include <XmlRpcValue.h>
 #include <ros/ros.h>
@@ -63,18 +65,19 @@ public:
    */
   void write(const ros::Time &time, const ros::Duration &period) override;
 
-  void pack(uint8_t *tx_buffer, uint8_t id, unsigned char data[6]) const;
+  void pack(unsigned char *tx_buffer, unsigned char ctrl, unsigned char *data);
+  void unpack(std::vector<uint8_t> rx_buffer);
   void setInterface();
 
   void clearTxBuffer() {
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < k_frame_length_; i++)
       tx_buffer_[i] = 0;
     tx_len_ = 0;
   }
   void clearRxBuffer() {
-    for (int i = 0; i < rx_buffer_.size(); i++)
-      rx_buffer_[i] = 0;
-    rx_len_ = 0;
+    for (auto iter = rx_buffer_.begin(); iter != rx_buffer_.end();) {
+      iter = rx_buffer_.erase(iter);
+    }
   }
   unsigned char getCrc8(unsigned char *ptr, unsigned short len) {
     unsigned char crc;
@@ -103,9 +106,10 @@ private:
 
   int rx_len_;
   std::vector<uint8_t> rx_buffer_;
-  uint8_t tx_buffer_[12];
+  uint8_t tx_buffer_[19];
   int tx_len_;
-  const int k_frame_length_ = 12, k_header_length_ = 2, k_data_length_8,
+  const int k_frame_length_ = 19, k_header_length_ = 2, k_ctrl_length_ = 1,
+            k_length_ = 1, k_data_length_ = 12, k_crc_length_ = 1,
             k_tail_length_ = 2;
 
   //通信协议常量
@@ -113,14 +117,12 @@ private:
   const unsigned char ender[2] = {0x0d, 0x0a};
 };
 
-struct DataStruct {
-  unsigned char id_;
-  unsigned char length_;
-  unsigned char data_[6];
-};
-struct SerialFrame {
-  unsigned char header_[2];
-  DataStruct content_[8];
-  unsigned char end_[2];
-};
+typedef struct {
+  unsigned char header_[2]; // k_header_length_
+  unsigned char ctrl_;      // k_ctrl_length_
+  unsigned char length_;    // k_length_
+  unsigned char data_[12];  // k_data_length_
+  unsigned char crc_;       // k_crc_length_
+  unsigned char ender_[2];  // k_tail_length_
+} __packed SerialFrame;
 } // namespace steering_engine_hw

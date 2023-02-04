@@ -40,48 +40,25 @@ bool StRobotHW::init(ros::NodeHandle &root_nh, ros::NodeHandle &robot_hw_nh) {
 }
 
 void StRobotHW::read(const ros::Time &time, const ros::Duration &period) {
-  unsigned char id, length = 0;
-  unsigned char data[6] = {0};
   if (serial_.available()) {
     rx_len_ = static_cast<int>(serial_.available());
     serial_.read(rx_buffer_, rx_len_);
-    ROS_INFO("length: %d, read: %x %x", rx_len_, rx_buffer_[0], rx_buffer_[1]);
 
-    // 检查信息头
-    if (rx_buffer_[0] != header[0] ||
-        rx_buffer_[1] != header[1]) // buf[0] buf[1]
-    {
-      ROS_WARN("Received message header error!");
-      return;
-    }
-
-    //读取控制位
-    id = rx_buffer_[2]; // buf[2]
-
-    //读取数据长度
-    length = rx_buffer_[3]; // buf[3]
-
-    //读取数据
-    for (int i = 0; i < 6; i++)
-      data[i] = rx_buffer_[4 + i];
+    unpack(rx_buffer_);
 
   } else {
     return;
   }
-
   clearRxBuffer();
 }
 
 void StRobotHW::write(const ros::Time &time, const ros::Duration &period) {
   static long int i = 0;
-  uint8_t id = 0xc0;
-  uint8_t data = i % 180;
+  uint8_t ctrl = 0xc0;
+  uint8_t data[12] = {0};
+  data[0] = i % 180;
 
-  unsigned char d[6];
-  d[0] = id;
-  d[1] = data;
-
-  pack(tx_buffer_, id, &data);
+  pack(tx_buffer_, ctrl, data);
   tx_len_ = sizeof(tx_buffer_);
   try {
     serial_.write(tx_buffer_, tx_len_);
@@ -89,7 +66,6 @@ void StRobotHW::write(const ros::Time &time, const ros::Duration &period) {
   }
   i += 1;
   clearTxBuffer();
-  ROS_INFO("Write: %d", data);
 }
 
 void StRobotHW::setInterface() {
@@ -101,19 +77,66 @@ void StRobotHW::setInterface() {
   position_joint_interface_.registerHandle(joint_handle);
 }
 
-void StRobotHW::pack(uint8_t *tx_buffer, uint8_t id,
-                     unsigned char data[6]) const {
+void StRobotHW::pack(unsigned char *tx_buffer, unsigned char ctrl,
+                     unsigned char *data) {
   memset(tx_buffer, 0, k_frame_length_);
   auto *frame = reinterpret_cast<SerialFrame *>(tx_buffer);
 
-  // 设置消息头
+  // set header
   for (int i = 0; i < 2; i++) {
     frame->header_[i] = header[i];
-    frame->end_[0] = ender[0];
   }
 
-  frame->content_->id_ = id;
-  frame->content_->length_ = 8;
-  memcpy(frame->content_->data_, data, 6);
+  // set control
+  frame->ctrl_ = ctrl;
+
+  // set data length
+  frame->length_ = k_data_length_;
+
+  // set data
+  memcpy(frame->data_, data, k_data_length_);
+
+  // set crc
+  frame->crc_ = getCrc8(tx_buffer, k_header_length_ + k_ctrl_length_ +
+                                       k_length_ + k_data_length_);
+
+  // ser ender
+  for (int i = 0; i < 2; i++) {
+    frame->ender_[i] = ender[i];
+  }
+}
+
+void StRobotHW::unpack(std::vector<uint8_t> rx_buffer) {
+  uint8_t ctrl, length;
+
+  // check header and ender
+  if (rx_buffer[0] != header[0] || rx_buffer[1] != header[1]) // buf[0] buf[1]
+  {
+    return;
+  } else if (rx_buffer[17] != ender[0] || rx_buffer[18] != ender[1]) {
+    ROS_WARN("Received message ender error! Want: %x %x Real: %x %x", ender[0],
+             ender[1], rx_buffer[17], rx_buffer[18]);
+    return;
+  }
+
+  //读取控制位
+  ctrl = rx_buffer_[2]; // buf[2]
+
+  //读取数据长度
+  length = rx_buffer[3]; // buf[3]
+
+  // check crc
+  if (rx_buffer[16] !=
+      getCrc8(static_cast<unsigned char *>(&rx_buffer[0]), 4 + length)) {
+    ROS_WARN("Received message crc check error! Want: %02x Real: %02x",
+             getCrc8(static_cast<unsigned char *>(&rx_buffer[0]), 4 + length),
+             rx_buffer[16]);
+    return;
+  }
+
+  //读取数据
+  // It requires think about how to storage data
+
+  ROS_INFO("read: %d", rx_buffer[4]);
 }
 } // namespace steering_engine_hw
