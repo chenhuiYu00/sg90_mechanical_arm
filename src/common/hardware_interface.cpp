@@ -56,7 +56,6 @@ void StRobotHW::write(const ros::Time &time, const ros::Duration &period) {
   static long int i = 0;
   uint8_t ctrl = 0xc0;
   uint8_t data[12] = {0};
-  data[0] = i % 180;
 
   pack(tx_buffer_, ctrl, data);
   tx_len_ = sizeof(tx_buffer_);
@@ -64,13 +63,13 @@ void StRobotHW::write(const ros::Time &time, const ros::Duration &period) {
     serial_.write(tx_buffer_, tx_len_);
   } catch (serial::PortNotOpenedException &e) {
   }
-  i += 1;
+  i += 4;
   clearTxBuffer();
 }
 
 void StRobotHW::setInterface() {
   hardware_interface::JointStateHandle single_state_handle(
-      "test_joint", &angle_, &vel_, &effort_);
+      "test_joint", &angle_[0], &vel_[4], &effort_[4]);
   joint_state_interface_.registerHandle(single_state_handle);
   hardware_interface::JointHandle joint_handle(
       joint_state_interface_.getHandle("test_joint"), &cmd_);
@@ -135,8 +134,8 @@ void StRobotHW::unpack(std::vector<uint8_t> rx_buffer) {
   }
 
   //读取数据
-  // It requires think about how to storage data
-
-  ROS_INFO("read: %d", rx_buffer[4]);
+  for (int i = 0; i < 5; i++) {
+    angle_[i] = rx_buffer[4 + i];
+  }
 }
 } // namespace steering_engine_hw

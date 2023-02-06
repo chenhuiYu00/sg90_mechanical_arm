@@ -79,7 +79,7 @@ public:
       iter = rx_buffer_.erase(iter);
     }
   }
-  unsigned char getCrc8(unsigned char *ptr, unsigned short len) {
+  static unsigned char getCrc8(unsigned char *ptr, unsigned short len) {
     unsigned char crc;
     unsigned char i;
     crc = 0;
@@ -96,7 +96,7 @@ public:
   }
 
 private:
-  double angle_, vel_, effort_;
+  double angle_[4], vel_[4], effort_[4];
   double cmd_;
   serial::Serial serial_;
 
