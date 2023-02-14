@@ -1,0 +1,14 @@
+digraph G {
+node [shape=box];
+"base_link" [label="base_link"];
+"rotary_table_1" [label="rotary_table_1"];
+"middle_1_1" [label="middle_1_1"];
+"left_3_1" [label="left_3_1"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"base_link" -> "rotation_baselink_joint" [label="xyz: -0.041992 0.006062 0.04 \nrpy: 0 -0 0"]
+"rotation_baselink_joint" -> "rotary_table_1"
+"rotary_table_1" -> "middle_rotation_joint" [label="xyz: 0.013998 -0.02 0.025791 \nrpy: 0 -0 0"]
+"middle_rotation_joint" -> "middle_1_1"
+"middle_1_1" -> "left3_middle_joint" [label="xyz: 0.029828 0.024 0.067722 \nrpy: 0 -0 0"]
+"left3_middle_joint" -> "left_3_1"
+}
