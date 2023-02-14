@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
         roscpp
         rospy
         serial
+        urdf
+        transmission_interface
         controller_manager
         rm_common
         )

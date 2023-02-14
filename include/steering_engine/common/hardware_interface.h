@@ -24,6 +24,8 @@
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
 #include <joint_limits_interface/joint_limits_interface.h>
+#include <transmission_interface/simple_transmission.h>
+#include <transmission_interface/transmission_interface.h>
 #include <transmission_interface/transmission_interface_loader.h>
 
 namespace steering_engine_hw {
@@ -67,7 +69,12 @@ public:
 
   void pack(unsigned char *tx_buffer, unsigned char ctrl, unsigned char *data);
   void unpack(std::vector<uint8_t> rx_buffer);
+  bool loadUrdf(ros::NodeHandle &root_nh);
+  bool setupTransmission(ros::NodeHandle &root_nh);
+  // bool setupJointLimit(ros::NodeHandle &root_nh);
+
   void setInterface();
+  void setTransmission();
 
   void clearTxBuffer() {
     for (int i = 0; i < k_frame_length_; i++)
@@ -78,6 +85,9 @@ public:
     for (auto iter = rx_buffer_.begin(); iter != rx_buffer_.end();) {
       iter = rx_buffer_.erase(iter);
     }
+  }
+  void updateControllerManager(const ros::Time &time, const ros::Duration &dt) {
+    controller_manager_->update(time, dt);
   }
   static unsigned char getCrc8(unsigned char *ptr, unsigned short len) {
     unsigned char crc;
@@ -97,12 +107,28 @@ public:
 
 private:
   double angle_[4], vel_[4], effort_[4];
-  double cmd_;
+  double cmd_[4];
   serial::Serial serial_;
 
+  // interface of the robot
   hardware_interface::JointStateInterface joint_state_interface_;
+  hardware_interface::PositionActuatorInterface position_act_interface_;
+  hardware_interface::ActuatorStateInterface act_state_interface_;
   hardware_interface::PositionJointInterface position_joint_interface_;
   std::shared_ptr<controller_manager::ControllerManager> controller_manager_;
+  std::vector<hardware_interface::JointHandle> position_joint_handles_{};
+
+  // transmission of the robot
+  transmission_interface::ActuatorToJointStateInterface *act_to_jnt_state_{};
+  transmission_interface::JointToActuatorPositionInterface
+      *jnt_to_act_effort_{};
+  transmission_interface::RobotTransmissions robot_transmissions_;
+  std::unique_ptr<transmission_interface::TransmissionInterfaceLoader>
+      transmission_loader_;
+
+  // URDF model of the robot
+  std::string urdf_string_;                 // for transmission
+  std::shared_ptr<urdf::Model> urdf_model_; // for limit
 
   int rx_len_;
   std::vector<uint8_t> rx_buffer_;
