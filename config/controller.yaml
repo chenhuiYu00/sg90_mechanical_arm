@@ -1,0 +1,19 @@
+sg90_mechanical_arm_controller:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50
+
+  # Position Controllers --------------------------------------
+  middle_rotation_joint_position_controller:
+    type: position_controllers/JointPositionController
+    joint: middle_rotation_joint
+    pid: {p: 1.5, i: 0.01, d: 0.05}
+  rotation_baselink_joint_position_controller:
+    type: position_controllers/JointPositionController
+    joint: rotation_baselink_joint
+    pid: {p: 5.0, i: 0.01, d: 0.05}
+  left3_middle_joint_position_controller:
+    type: position_controllers/JointPositionController
+    joint: left3_middle_joint
+    pid: {p: 1.5, i: 0.01, d: 0.01}
