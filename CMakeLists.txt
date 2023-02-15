@@ -12,8 +12,11 @@ find_package(catkin REQUIRED COMPONENTS
         rospy
         serial
         urdf
+
         transmission_interface
         controller_manager
+        tf2_kdl
+        kdl_parser
         rm_common
         )
 

@@ -32,6 +32,7 @@ int main(int argc, char **argv) {
     hardware.write(ros::Time::now(), ros::Duration(1.0 / 40));
 
     hardware.updateControllerManager(current_time, dt);
+    hardware.updateTf(current_time);
 
     previous_time = current_time;
     loop_rate.sleep();

@@ -15,8 +15,9 @@ bool StRobotHW::init(ros::NodeHandle &root_nh, ros::NodeHandle &robot_hw_nh) {
       serial::flowcontrol_t::flowcontrol_none; //创建数据流控制，不使用
   serial::stopbits_t st = serial::stopbits_t::stopbits_one; //创建终止位为1位
 
-  serial_.setPort("/dev/usbSteering");
-  ROS_INFO("setPort: /dev/usbSteering");
+  std::string port_name = "/dev/usbSteering";
+  serial_.setPort(port_name);
+  ROS_INFO("%s", port_name.c_str());
   serial_.setBaudrate(115200);
   serial_.setParity(pt);      //设置校验位
   serial_.setBytesize(bt);    //设置发送字节数
@@ -40,6 +41,7 @@ bool StRobotHW::init(ros::NodeHandle &root_nh, ros::NodeHandle &robot_hw_nh) {
   //    return false;
   //  }
 
+  setKDLSegment();
   controller_manager_.reset(new controller_manager::ControllerManager(this));
 
   if (serial_.isOpen())
@@ -133,12 +135,21 @@ bool StRobotHW::setupTransmission(ros::NodeHandle &root_nh) {
 
   auto position_joint_interface =
       this->get<hardware_interface::PositionJointInterface>();
-  std::vector<std::string> names = position_joint_interface->getNames();
+  std::vector<std::string> p_j_names = position_joint_interface->getNames();
+  auto joint_state_interface =
+      this->get<hardware_interface::JointStateInterface>();
+  std::vector<std::string> j_s_names = joint_state_interface->getNames();
 
-  for (const auto &name : names) {
-    ROS_INFO("%s", name.c_str());
+  for (const auto &name : p_j_names) {
+    ROS_INFO("position_joint_handle: %s", name.c_str());
     position_joint_handles_.push_back(
         position_joint_interface->getHandle(name));
+  }
+  for (const auto &name : j_s_names) {
+    ROS_INFO("joint_state_handle: %s", name.c_str());
+    joint_state_handles_.push_back(joint_state_interface->getHandle(name));
+    joint_states_segment_.insert(
+        std::make_pair(name, joint_state_interface->getHandle(name)));
   }
 
   return true;
@@ -178,6 +189,73 @@ void StRobotHW::setInterface() {
   // registerInterface(&position_joint_interface_);
   registerInterface(&act_state_interface_);
   registerInterface(&position_act_interface_);
+}
+
+void StRobotHW::setKDLSegment() {
+  KDL::Tree tree;
+  if (!kdl_parser::treeFromUrdfModel(*urdf_model_, tree)) {
+    ROS_ERROR("Failed to extract kdl tree from xml robot description");
+  }
+  addChildren(tree.getRootSegment());
+}
+
+void StRobotHW::addChildren(const KDL::SegmentMap::const_iterator segment) {
+  const std::string &root = GetTreeElementSegment(segment->second).getName();
+
+  const std::vector<KDL::SegmentMap::const_iterator> &children =
+      GetTreeElementChildren(segment->second);
+  for (auto i : children) {
+    const KDL::Segment &child = GetTreeElementSegment(i->second);
+    SegmentPair s(GetTreeElementSegment(i->second), root, child.getName());
+    if (child.getJoint().getType() == KDL::Joint::None) {
+      if (urdf_model_->getJoint(child.getJoint().getName()) &&
+          urdf_model_->getJoint(child.getJoint().getName())->type ==
+              urdf::Joint::FLOATING) {
+        ROS_INFO("Floating joint. Not adding segment from %s to %s. This TF "
+                 "can not be published based on joint_states info",
+                 root.c_str(), child.getName().c_str());
+      } else {
+        segments_fixed_.insert(make_pair(child.getJoint().getName(), s));
+        ROS_DEBUG("Adding fixed segment from %s to %s", root.c_str(),
+                  child.getName().c_str());
+      }
+    } else {
+      segments_.insert(make_pair(child.getJoint().getName(), s));
+      ROS_DEBUG("Adding moving segment from %s to %s", root.c_str(),
+                child.getName().c_str());
+    }
+    addChildren(i);
+  }
+}
+
+void StRobotHW::updateTf(const ros::Time &time) {
+  //  std::vector<std::string> link_names;
+  //  for (const auto &link : urdf_model_->links_) {
+  //    link_names.push_back(link.first);
+
+  std::vector<geometry_msgs::TransformStamped> tf_transforms;
+  geometry_msgs::TransformStamped tf_transform;
+  // Loop over all float segments
+  for (auto &item : segments_) {
+    auto jnt_iter = joint_states_segment_.find(item.first);
+    if (jnt_iter != joint_states_segment_.end())
+      tf_transform = tf2::kdlToTransform(
+          item.second.segment.pose(jnt_iter->second.getPosition()));
+    else {
+      ROS_WARN_THROTTLE(
+          10,
+          "Joint state with name: \"%s\" was received but not found in URDF",
+          item.first.c_str());
+      continue;
+    }
+    tf_transform.header.stamp = time;
+    tf_transform.header.frame_id = stripSlash(item.second.root);
+    tf_transform.child_frame_id = stripSlash(item.second.tip);
+    tf_transforms.push_back(tf_transform);
+  }
+  tf_broadcaster_.sendTransform(tf_transforms);
+
+  tf_transforms.clear();
 }
 
 void StRobotHW::pack(unsigned char *tx_buffer, unsigned char ctrl,

@@ -14,8 +14,14 @@
 
 // ROS
 #include <XmlRpcValue.h>
+#include <geometry_msgs/TransformStamped.h>
+#include <kdl/tree.hpp>
+#include <kdl_parser/kdl_parser.hpp>
 #include <ros/ros.h>
 #include <serial/serial.h>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_kdl/tf2_kdl.h>
+#include <tf2_ros/transform_broadcaster.h>
 #include <urdf/model.h>
 
 // ROS control
@@ -29,6 +35,17 @@
 #include <transmission_interface/transmission_interface_loader.h>
 
 namespace steering_engine_hw {
+
+class SegmentPair {
+public:
+  SegmentPair(const KDL::Segment &p_segment, std::string p_root,
+              std::string p_tip)
+      : segment(p_segment), root(std::move(p_root)), tip(std::move(p_tip)) {}
+
+  KDL::Segment segment{};
+  std::string root, tip;
+};
+
 class StRobotHW : public hardware_interface::RobotHW {
 public:
   StRobotHW() = default;
@@ -69,12 +86,25 @@ public:
 
   void pack(unsigned char *tx_buffer, unsigned char ctrl, unsigned char *data);
   void unpack(std::vector<uint8_t> rx_buffer);
-  bool loadUrdf(ros::NodeHandle &root_nh);
-  bool setupTransmission(ros::NodeHandle &root_nh);
-  // bool setupJointLimit(ros::NodeHandle &root_nh);
 
+  bool loadUrdf(ros::NodeHandle &root_nh);
   void setInterface();
-  void setTransmission();
+  bool setupTransmission(ros::NodeHandle &root_nh);
+
+  void setKDLSegment();
+  void addChildren(const KDL::SegmentMap::const_iterator segment);
+  void updateTf(const ros::Time &time);
+  //去除输入字符串开头的斜线
+  std::string stripSlash(const std::string &in) {
+    if (!in.empty() && in[0] == '/') {
+      return in.substr(1);
+    }
+    return in;
+  }
+
+  void updateControllerManager(const ros::Time &time, const ros::Duration &dt) {
+    controller_manager_->update(time, dt);
+  }
 
   void clearTxBuffer() {
     for (int i = 0; i < k_frame_length_; i++)
@@ -85,9 +115,6 @@ public:
     for (auto iter = rx_buffer_.begin(); iter != rx_buffer_.end();) {
       iter = rx_buffer_.erase(iter);
     }
-  }
-  void updateControllerManager(const ros::Time &time, const ros::Duration &dt) {
-    controller_manager_->update(time, dt);
   }
   static unsigned char getCrc8(unsigned char *ptr, unsigned short len) {
     unsigned char crc;
@@ -111,11 +138,11 @@ private:
   serial::Serial serial_;
 
   // interface of the robot
-  hardware_interface::JointStateInterface joint_state_interface_;
   hardware_interface::PositionActuatorInterface position_act_interface_;
   hardware_interface::ActuatorStateInterface act_state_interface_;
   hardware_interface::PositionJointInterface position_joint_interface_;
   std::shared_ptr<controller_manager::ControllerManager> controller_manager_;
+  std::vector<hardware_interface::JointStateHandle> joint_state_handles_{};
   std::vector<hardware_interface::JointHandle> position_joint_handles_{};
 
   // transmission of the robot
@@ -129,6 +156,13 @@ private:
   // URDF model of the robot
   std::string urdf_string_;                 // for transmission
   std::shared_ptr<urdf::Model> urdf_model_; // for limit
+
+  // TF broader
+  tf2_ros::TransformBroadcaster tf_broadcaster_;
+  geometry_msgs::TransformStamped transformStamped_;
+  std::map<std::string, SegmentPair> segments_, segments_fixed_;
+  std::map<std::string, hardware_interface::JointStateHandle>
+      joint_states_segment_;
 
   int rx_len_;
   std::vector<uint8_t> rx_buffer_;
