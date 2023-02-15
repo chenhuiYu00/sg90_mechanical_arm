@@ -86,6 +86,17 @@
   </collision-->
 </link>
 
+
+<!-- add a dummy link -->
+<link name="dummy_link"/>
+<!-- change the root link to be child of the dummy link -->
+<joint name="dummy_joint" type="fixed">
+  <parent link="dummy_link"/>
+  <child link="base_link"/>
+  <origin xyz="0 0 0" rpy="0 0 0"/>
+</joint>
+
+
 <joint name="middle_rotation_joint" type="continuous">
   <origin xyz="0.013998 -0.02 0.025791" rpy="0 0 0"/>
   <limit effort="10.0" lower="-1.0" upper="2.0" velocity="1.0" />

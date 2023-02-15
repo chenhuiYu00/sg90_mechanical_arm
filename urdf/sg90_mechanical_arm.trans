@@ -4,7 +4,7 @@
 <transmission name="middle_rotation_joint_tran">
   <type>transmission_interface/SimpleTransmission</type>
     <actuator name="middle_rotation_joint_motor">
-    <mechanicalReduction>1</mechanicalReduction>
+    <mechanicalReduction>57.29578</mechanicalReduction>
   </actuator>
   <joint name="middle_rotation_joint">
     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
@@ -17,7 +17,7 @@
     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
   </joint>
   <actuator name="rotation_baselink_joint_motor">
-    <mechanicalReduction>1</mechanicalReduction>
+    <mechanicalReduction>57.29578</mechanicalReduction>
   </actuator>
 </transmission>
 
@@ -27,7 +27,7 @@
     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
   </joint>
   <actuator name="left3_middle_joint_motor">
-    <mechanicalReduction>1</mechanicalReduction>
+    <mechanicalReduction>57.29578</mechanicalReduction>
   </actuator>
 </transmission>
 
