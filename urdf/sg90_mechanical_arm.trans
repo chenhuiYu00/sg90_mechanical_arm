@@ -1,37 +1,37 @@
 <?xml version="1.0" ?>
 <robot name="sg90_mechanical_arm" xmlns:xacro="http://www.ros.org/wiki/xacro" >
 
-<transmission name="middle_rotation_joint_tran">
-  <type>transmission_interface/SimpleTransmission</type>
-  <joint name="middle_rotation_joint">
-    <offset>0</offset>
-    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-  </joint>
-  <actuator name="middle_rotation_joint_motor">
-    <mechanicalReduction>-57.29578</mechanicalReduction>
-  </actuator>
-</transmission>
+	<transmission name="middle_rotation_joint_tran">
+	  <type>transmission_interface/SimpleTransmission</type>
+	  <joint name="middle_rotation_joint">
+	    <offset>0</offset>
+	    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+	  </joint>
+	  <actuator name="middle_rotation_joint_motor">
+	    <mechanicalReduction>-57.29578</mechanicalReduction>
+	  </actuator>
+	</transmission>
 
-<transmission name="rotation_baselink_joint_tran">
-  <type>transmission_interface/SimpleTransmission</type>
-  <joint name="rotation_baselink_joint">
-    <offset>1.5707963</offset>
-    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-  </joint>
-  <actuator name="rotation_baselink_joint_motor">
-    <mechanicalReduction>57.29578</mechanicalReduction>
-  </actuator>
-</transmission>
+	<transmission name="rotation_baselink_joint_tran">
+	  <type>transmission_interface/SimpleTransmission</type>
+	  <joint name="rotation_baselink_joint">
+	    <offset>1.5707963</offset>
+	    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+	  </joint>
+	  <actuator name="rotation_baselink_joint_motor">
+	    <mechanicalReduction>57.29578</mechanicalReduction>
+	  </actuator>
+	</transmission>
 
-<transmission name="left3_middle_joint_tran">
-  <type>transmission_interface/SimpleTransmission</type>
-  <joint name="left3_middle_joint">
-    <offset>0</offset>
-    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-  </joint>
-  <actuator name="left3_middle_joint_motor">
-    <mechanicalReduction>-57.29578</mechanicalReduction>
-  </actuator>
-</transmission>
+	<transmission name="left3_middle_joint_tran">
+	  <type>transmission_interface/SimpleTransmission</type>
+	  <joint name="left3_middle_joint">
+	    <offset>0</offset>
+	    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+	  </joint>
+	  <actuator name="left3_middle_joint_motor">
+	    <mechanicalReduction>-57.29578</mechanicalReduction>
+	  </actuator>
+	</transmission>
 
 </robot>

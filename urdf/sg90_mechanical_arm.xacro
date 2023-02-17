@@ -1,126 +1,126 @@
 <?xml version="1.0" ?>
 <robot name="sg90_mechanical_arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-<xacro:include filename="$(find steering_engine)/urdf/materials.xacro" />
-<link name="base_link">
-  <inertial>
-    <origin xyz="-0.024026499260378316 0.0060624763789460965 0.00843996637468139" rpy="0 0 0"/>
-    <mass value="0.5154028624203417"/>
-    <inertia ixx="0.000431" iyy="0.000868" izz="0.00119" ixy="0.0" iyz="-0.0" ixz="6.7e-05"/>
-  </inertial>
-  <visual>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://steering_engine/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-    <material name="silver"/>
-  </visual>
-  <collision>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://steering_engine/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-  </collision>
-</link>
+	<xacro:include filename="$(find steering_engine)/urdf/materials.xacro" />
+	<xacro:include filename="$(find steering_engine)/urdf/sg90_mechanical_arm.trans" />
+	<xacro:include filename="$(find steering_engine)/urdf/sg90_mechanical_arm.gazebo" />
+	<link name="base_link">
+	  <inertial>
+	    <origin xyz="-0.024026499260378316 0.0060624763789460965 0.00843996637468139" rpy="0 0 0"/>
+	    <mass value="0.5154028624203417"/>
+	    <inertia ixx="0.000431" iyy="0.000868" izz="0.00119" ixy="0.0" iyz="-0.0" ixz="6.7e-05"/>
+	  </inertial>
+	  <visual>
+	    <origin xyz="0 0 0" rpy="0 0 0"/>
+	    <geometry>
+	      <mesh filename="package://steering_engine/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+	    </geometry>
+	    <material name="silver"/>
+	  </visual>
+	  <collision>
+	    <origin xyz="0 0 0" rpy="0 0 0"/>
+	    <geometry>
+	      <mesh filename="package://steering_engine/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+	    </geometry>
+	  </collision>
+	</link>
 
-<link name="middle_1_1">
-  <inertial>
-    <origin xyz="0.01513320402587121 0.014933333665403777 0.034358753097481154" rpy="0 0 0"/>
-    <mass value="0.07756212690094338"/>
-    <inertia ixx="4.5e-05" iyy="4.1e-05" izz="1.8e-05" ixy="-0.0" iyz="-0.0" ixz="-1.5e-05"/>
-  </inertial>
-  <visual>
-    <origin xyz="0.027994 0.013938 -0.062791" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://steering_engine/meshes/middle_1_1.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-    <material name="silver"/>
-  </visual>
-  <!--collision>
-    <origin xyz="0.027994 0.013938 -0.062791" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://steering_engine/meshes/middle_1_1.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-  </collision-->
-</link>
+	<link name="middle_1_1">
+	  <inertial>
+	    <origin xyz="0.01513320402587121 0.014933333665403777 0.034358753097481154" rpy="0 0 0"/>
+	    <mass value="0.07756212690094338"/>
+	    <inertia ixx="4.5e-05" iyy="4.1e-05" izz="1.8e-05" ixy="-0.0" iyz="-0.0" ixz="-1.5e-05"/>
+	  </inertial>
+	  <visual>
+	    <origin xyz="0.027994 0.013938 -0.062791" rpy="0 0 0"/>
+	    <geometry>
+	      <mesh filename="package://steering_engine/meshes/middle_1_1.stl" scale="0.001 0.001 0.001"/>
+	    </geometry>
+	    <material name="silver"/>
+	  </visual>
+	  <!--collision>
+	    <origin xyz="0.027994 0.013938 -0.062791" rpy="0 0 0"/>
+	    <geometry>
+	      <mesh filename="package://steering_engine/meshes/middle_1_1.stl" scale="0.001 0.001 0.001"/>
+	    </geometry>
+	  </collision-->
+	</link>
 
-<link name="rotary_table_1">
-  <inertial>
-    <origin xyz="-0.0016625287909776201 0.00034335070993870426 0.0102317425159636" rpy="0 0 0"/>
-    <mass value="0.26679313042606956"/>
-    <inertia ixx="0.000154" iyy="0.000144" izz="0.00021" ixy="-2e-06" iyz="1e-06" ixz="-1e-06"/>
-  </inertial>
-  <visual>
-    <origin xyz="0.041992 -0.006062 -0.037" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://steering_engine/meshes/rotary_table_1.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-    <material name="silver"/>
-  </visual>
-  <!--collision>
-    <origin xyz="0.041992 -0.006062 -0.037" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://steering_engine/meshes/rotary_table_1.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-  </collision-->
-</link>
+	<link name="rotary_table_1">
+	  <inertial>
+	    <origin xyz="-0.0016625287909776201 0.00034335070993870426 0.0102317425159636" rpy="0 0 0"/>
+	    <mass value="0.26679313042606956"/>
+	    <inertia ixx="0.000154" iyy="0.000144" izz="0.00021" ixy="-2e-06" iyz="1e-06" ixz="-1e-06"/>
+	  </inertial>
+	  <visual>
+	    <origin xyz="0.041992 -0.006062 -0.037" rpy="0 0 0"/>
+	    <geometry>
+	      <mesh filename="package://steering_engine/meshes/rotary_table_1.stl" scale="0.001 0.001 0.001"/>
+	    </geometry>
+	    <material name="silver"/>
+	  </visual>
+	  <!--collision>
+	    <origin xyz="0.041992 -0.006062 -0.037" rpy="0 0 0"/>
+	    <geometry>
+	      <mesh filename="package://steering_engine/meshes/rotary_table_1.stl" scale="0.001 0.001 0.001"/>
+	    </geometry>
+	  </collision-->
+	</link>
 
-<link name="left_3_1">
-  <inertial>
-    <origin xyz="0.01931943652113552 0.008316439058373582 -0.011160565948617404" rpy="0 0 0"/>
-    <mass value="0.018760305555478165"/>
-    <inertia ixx="6e-06" iyy="2.2e-05" izz="1.6e-05" ixy="-0.0" iyz="0.0" ixz="9e-06"/>
-  </inertial>
-  <visual>
-    <origin xyz="-0.001834 -0.013062 -0.130513" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://steering_engine/meshes/left_3_1.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-    <material name="silver"/>
-  </visual>
-  <!--collision>
-    <origin xyz="-0.001834 -0.013062 -0.130513" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://sg90_mechanical_arm_description/meshes/left_3_1.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-  </collision-->
-</link>
-
-
-<!-- add a dummy link -->
-<link name="dummy_link"/>
-<!-- change the root link to be child of the dummy link -->
-<joint name="dummy_joint" type="fixed">
-  <parent link="dummy_link"/>
-  <child link="base_link"/>
-  <origin xyz="0 0 0" rpy="0 0 0"/>
-</joint>
+	<link name="left_3_1">
+	  <inertial>
+	    <origin xyz="0.01931943652113552 0.008316439058373582 -0.011160565948617404" rpy="0 0 0"/>
+	    <mass value="0.018760305555478165"/>
+	    <inertia ixx="6e-06" iyy="2.2e-05" izz="1.6e-05" ixy="-0.0" iyz="0.0" ixz="9e-06"/>
+	  </inertial>
+	  <visual>
+	    <origin xyz="-0.001834 -0.013062 -0.130513" rpy="0 0 0"/>
+	    <geometry>
+	      <mesh filename="package://steering_engine/meshes/left_3_1.stl" scale="0.001 0.001 0.001"/>
+	    </geometry>
+	    <material name="silver"/>
+	  </visual>
+	  <!--collision>
+	    <origin xyz="-0.001834 -0.013062 -0.130513" rpy="0 0 0"/>
+	    <geometry>
+	      <mesh filename="package://sg90_mechanical_arm_description/meshes/left_3_1.stl" scale="0.001 0.001 0.001"/>
+	    </geometry>
+	  </collision-->
+	</link>
 
 
-<joint name="middle_rotation_joint" type="continuous">
-  <origin xyz="0.013998 -0.02 0.025791" rpy="0 0 0"/>
-  <limit effort="10.0" lower="-1.0" upper="2.0" velocity="1.0" />
-  <parent link="rotary_table_1"/>
-  <child link="middle_1_1"/>
-  <axis xyz="-0.0 -1.0 -0.0"/>
-</joint>
+	<!-- add a dummy link -->
+	<link name="dummy_link"/>
+	<!-- change the root link to be child of the dummy link -->
+	<joint name="dummy_joint" type="fixed">
+	  <parent link="dummy_link"/>
+	  <child link="base_link"/>
+	  <origin xyz="0 0 0" rpy="0 0 0"/>
+	</joint>
 
-<joint name="rotation_baselink_joint" type="continuous">
-  <origin xyz="-0.041992 0.006062 0.040" rpy="0 0 0"/>
-  <limit effort="10.0" lower="-0.785" upper="0.785" velocity="1.0" />
-  <parent link="base_link"/>
-  <child link="rotary_table_1"/>
-  <axis xyz="-0.0 -0.0 1.0"/>
-</joint>
 
-<joint name="left3_middle_joint" type="continuous">
-  <origin xyz="0.029828 0.024 0.067722" rpy="0 0 0"/>
-  <limit effort="10.0" velocity="1.0" />
-  <parent link="middle_1_1"/>
-  <child link="left_3_1"/>
-  <axis xyz="0.0 1.0 0.0"/>
-</joint>
+	<joint name="middle_rotation_joint" type="continuous">
+	  <origin xyz="0.013998 -0.02 0.025791" rpy="0 0 0"/>
+	  <limit effort="10.0" lower="-1.0" upper="2.0" velocity="1.0" />
+	  <parent link="rotary_table_1"/>
+	  <child link="middle_1_1"/>
+	  <axis xyz="-0.0 -1.0 -0.0"/>
+	</joint>
 
-<xacro:include filename="$(find steering_engine)/urdf/sg90_mechanical_arm.trans" />
+	<joint name="rotation_baselink_joint" type="continuous">
+	  <origin xyz="-0.041992 0.006062 0.040" rpy="0 0 0"/>
+	  <limit effort="10.0" lower="-0.785" upper="0.785" velocity="1.0" />
+	  <parent link="base_link"/>
+	  <child link="rotary_table_1"/>
+	  <axis xyz="-0.0 -0.0 1.0"/>
+	</joint>
+
+	<joint name="left3_middle_joint" type="continuous">
+	  <origin xyz="0.029828 0.024 0.067722" rpy="0 0 0"/>
+	  <limit effort="10.0" velocity="1.0" />
+	  <parent link="middle_1_1"/>
+	  <child link="left_3_1"/>
+	  <axis xyz="0.0 1.0 0.0"/>
+	</joint>
 
 </robot>

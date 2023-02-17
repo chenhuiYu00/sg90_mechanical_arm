@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <launch>
-        <arg name="model" default="$(find steering_engine)/urdf/sg90_mechanical_arm.xacro"/>
-        <arg name="gui" default="true"/>
-	<arg name="rvizconfig" default="$(find steering_engine)/rviz/urdf.rviz"/>
+	<arg name="model" default="$(find steering_engine)/urdf/sg90_mechanical_arm.xacro"/>
+	<arg name="gui" default="true"/>
+	<arg name="rvizconfig" default="$(find steering_engine)/rviz/config.rviz"/>
 	<param name="robot_description" command="$(find xacro)/xacro $(arg model)"/>
 	<param name="use_gui" value="$(arg gui)"/>
 	
@@ -12,7 +12,7 @@
 	<arg name="gui" default="true" />
 	<arg name="use_sim_time" value="true"/>
 	
-       <node name="st_hardware" pkg="steering_engine" type="st_hardware" respawn="false" output="screen"/>
+	<node name="st_hardware" pkg="steering_engine" type="st_hardware" respawn="false" output="screen"/>
        
        
       <!-- joint state publisher -->
