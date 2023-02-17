@@ -24,7 +24,6 @@ bool StRobotHW::init(ros::NodeHandle &root_nh, ros::NodeHandle &robot_hw_nh) {
   serial_.setFlowcontrol(ft); //设置数据流控制
   serial_.setStopbits(st);    //设置终止位
   serial_.setTimeout(to);
-
   setInterface();
 
   if (!loadUrdf(root_nh)) {
@@ -61,7 +60,7 @@ void StRobotHW::read(const ros::Time &time, const ros::Duration &period) {
     serial_.read(rx_buffer_, rx_len_);
 
     unpack(rx_buffer_);
-    act_to_jnt_state_->propagate();
+    act_to_jnt_state_interface_->propagate();
   } else {
     return;
   }
@@ -73,12 +72,15 @@ void StRobotHW::write(const ros::Time &time, const ros::Duration &period) {
   uint8_t ctrl = 0xc0;
   uint8_t data[12] = {0};
 
-  jnt_to_act_effort_->propagate(); // now cmd[]'s data will be changed, pack
-                                   // cmd[] and send it.
+  jnt_to_act_position_interface_
+      ->propagate(); // now cmd[]'s data will be changed, pack
+                     // cmd[] and send it.
 
   for (int i = 1; i < 4; i++) {
-    *(data + i) = static_cast<uint8_t>(cmd_[i]);
+    *(data + i) = static_cast<uint8_t>(
+        cmd_[i] + offset_vector_[i]); // set offset, ugly and unfetchable code
   }
+  cmd_[3] = cmd_[3] + cmd_[2];
 
   if (memcmp(data, last_send_data, 12) != 0) {
     ROS_INFO("send rotation_baselink:%d  middle_rotation:%d left3_middle:%d",
@@ -106,7 +108,7 @@ bool StRobotHW::loadUrdf(ros::NodeHandle &root_nh) {
 
 bool StRobotHW::setupTransmission(ros::NodeHandle &root_nh) {
   try {
-    transmission_loader_ =
+    transmission_interface_loader_ =
         std::make_unique<transmission_interface::TransmissionInterfaceLoader>(
             this, &robot_transmissions_);
   } catch (const std::invalid_argument &ex) {
@@ -123,13 +125,14 @@ bool StRobotHW::setupTransmission(ros::NodeHandle &root_nh) {
   }
 
   // Perform transmission loading
-  if (!transmission_loader_->load(urdf_string_)) {
+  if (!transmission_interface_loader_->load(urdf_string_)) {
     return false;
   }
-  act_to_jnt_state_ =
+
+  act_to_jnt_state_interface_ =
       robot_transmissions_
           .get<transmission_interface::ActuatorToJointStateInterface>();
-  jnt_to_act_effort_ =
+  jnt_to_act_position_interface_ =
       robot_transmissions_
           .get<transmission_interface::JointToActuatorPositionInterface>();
 
@@ -312,6 +315,10 @@ void StRobotHW::unpack(std::vector<uint8_t> rx_buffer) {
     angle_[i] = static_cast<double>(rx_buffer[4 + i]);
     effort_[i] = 0.;
     vel_[i] = 0.;
+  }
+  // set offset, ugly and unfetchable code
+  for (int i = 0; i < 4; i++) {
+    angle_[i] -= offset_vector_[i - 1];
   }
 }
 } // namespace steering_engine_hw

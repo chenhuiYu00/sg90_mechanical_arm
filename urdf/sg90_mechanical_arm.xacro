@@ -11,14 +11,14 @@
   <visual>
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://sg90_mechanical_arm_description/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://steering_engine/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://sg90_mechanical_arm_description/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://steering_engine/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
@@ -32,14 +32,14 @@
   <visual>
     <origin xyz="0.027994 0.013938 -0.062791" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://sg90_mechanical_arm_description/meshes/middle_1_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://steering_engine/meshes/middle_1_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <!--collision>
     <origin xyz="0.027994 0.013938 -0.062791" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://sg90_mechanical_arm_description/meshes/middle_1_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://steering_engine/meshes/middle_1_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision-->
 </link>
@@ -53,14 +53,14 @@
   <visual>
     <origin xyz="0.041992 -0.006062 -0.037" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://sg90_mechanical_arm_description/meshes/rotary_table_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://steering_engine/meshes/rotary_table_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <!--collision>
     <origin xyz="0.041992 -0.006062 -0.037" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://sg90_mechanical_arm_description/meshes/rotary_table_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://steering_engine/meshes/rotary_table_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision-->
 </link>
@@ -74,7 +74,7 @@
   <visual>
     <origin xyz="-0.001834 -0.013062 -0.130513" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://sg90_mechanical_arm_description/meshes/left_3_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://steering_engine/meshes/left_3_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver"/>
   </visual>

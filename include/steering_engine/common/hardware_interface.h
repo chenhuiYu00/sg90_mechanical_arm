@@ -33,6 +33,7 @@
 #include <transmission_interface/simple_transmission.h>
 #include <transmission_interface/transmission_interface.h>
 #include <transmission_interface/transmission_interface_loader.h>
+#include <transmission_interface/transmission_loader.h>
 
 namespace steering_engine_hw {
 
@@ -146,12 +147,13 @@ private:
   std::vector<hardware_interface::JointHandle> position_joint_handles_{};
 
   // transmission of the robot
-  transmission_interface::ActuatorToJointStateInterface *act_to_jnt_state_{};
+  transmission_interface::ActuatorToJointStateInterface
+      *act_to_jnt_state_interface_{};
   transmission_interface::JointToActuatorPositionInterface
-      *jnt_to_act_effort_{};
+      *jnt_to_act_position_interface_{};
   transmission_interface::RobotTransmissions robot_transmissions_;
   std::unique_ptr<transmission_interface::TransmissionInterfaceLoader>
-      transmission_loader_;
+      transmission_interface_loader_;
 
   // URDF model of the robot
   std::string urdf_string_;                 // for transmission
@@ -175,6 +177,9 @@ private:
   //通信协议常量
   const unsigned char header[2] = {0x55, 0xaa};
   const unsigned char ender[2] = {0x0d, 0x0a};
+
+  // actor offset
+  std::vector<double> offset_vector_ = {0, 90, 90, 0};
 };
 
 typedef struct {
