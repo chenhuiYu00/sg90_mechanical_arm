@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<launch>
+
+	<arg name="model" default="$(find steering_engine)/urdf/sg90_mechanical_arm.xacro"/>
+	<arg name="gui" default="true"/>
+	<arg name="rvizconfig" default="$(find steering_engine)/rviz/config.rviz"/>
+	<param name="robot_description" command="$(find xacro)/xacro $(arg model)"/>
+	<param name="use_gui" value="$(arg gui)"/>
+	
+	<!-- rosparam -->
+	<param name="robot_description" command="$(find xacro)/xacro $(arg model)"/>
+	<param name="use_gui" value="$(arg gui)"/>
+	<arg name="gui" default="true" />
+	<arg name="use_sim_time" value="true"/>
+	
+	<!-- joint state publisher -->
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+       
+	<!-- gazebo -->
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+		<arg name="paused" value="true"/>
+        	<arg name="use_sim_time" value="true"/>
+        	<arg name="gui" value="true"/>
+        	<arg name="headless" value="false"/>
+        	<arg name="debug" value="false"/>
+	</include>
+	
+	<!-- spawn model -->
+	<node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-z 0.1 -param robot_description -urdf -model sg90_mechanical_arm"/>
+       
+ 	<!-- load controller yaml -->
+	<rosparam file="$(find steering_engine)/config/controller.yaml" command="load"/>
+       
+	<!-- controller manager -->
+	<node name="controller_manager" pkg="controller_manager"  type="controller_manager" output="screen"
+          args="load
+	 	 sg90_mechanical_arm_controller/joint_state_controller
+		 sg90_mechanical_arm_controller/middle_rotation_joint_position_controller
+		 sg90_mechanical_arm_controller/rotation_baselink_joint_position_controller
+	 	 sg90_mechanical_arm_controller/left3_middle_joint_position_controller
+	 	"/>
+	 	
+	<!-- rviz -->
+        <node name="rviz" pkg="rviz" args="-d $(arg rvizconfig)" type="rviz"/>
+          
+</launch>
